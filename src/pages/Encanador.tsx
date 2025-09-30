@@ -115,7 +115,7 @@ const Encanador: React.FC = () => {
 
       <Section>
         <SubLabel>Selecione a empresa?</SubLabel>
-        <Select value={service} onChange={(e) => setCompany(e.target.value)}>
+        <Select value={company} onChange={(e) => setCompany(e.target.value)}>
           <option value="encanador">LS CONEXÕES</option>
           <option value="pintor">HELP HIDRAULICAS</option>
           <option value="pintor">PLENSEG</option>
