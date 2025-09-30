@@ -60,7 +60,7 @@ const Home: React.FC = () => {
       <Grid>
         <Card to="/encanador" color="#2563eb">
           <FaWrench />
-          Encanador dd
+          Encanador
         </Card>
         <Card to="/encanador" color="#dc2626">
           <FaPaintRoller />
