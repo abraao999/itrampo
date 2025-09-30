@@ -114,12 +114,13 @@ const Encanador: React.FC = () => {
       </Section>
 
       <Section>
-        <Label>Empresa</Label>
-        <Input
-          type="text"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-        />
+        <SubLabel>Selecione a empresa?</SubLabel>
+        <Select value={service} onChange={(e) => setCompany(e.target.value)}>
+          <option value="encanador">LS CONEXÕES</option>
+          <option value="pintor">HELP HIDRAULICAS</option>
+          <option value="pintor">PLENSEG</option>
+          <option value="pintor">CLEITON EDIFICAÇÕES</option>
+        </Select>
       </Section>
 
       <Button onClick={handleSubmit}>Agendar horário</Button>
