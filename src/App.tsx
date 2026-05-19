@@ -1,25 +1,73 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Encanador from "./pages/Encanador";
-// import Pintor from "./pages/Pintor";
-// import Eletricista from "./pages/Eletricista";
-// import Pedreiro from "./pages/Pedreiro";
-import Diarista from "./pages/Diarista";
+import Login from "./pages/Login";
 import Servico from "./pages/Final";
-// import Jardineiro from "./pages/Jardineiro";
+import Specialty from "./pages/Specialty";
+import ProviderDashboard from "./pages/ProviderDashboard";
+import ProviderLogin from "./pages/ProviderLogin";
+
+type ProtectedRouteProps = {
+  children: React.ReactNode;
+};
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const token = localStorage.getItem("itrampo:token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const ProtectedProviderRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const token = localStorage.getItem("itrampo:providerToken");
+
+  if (!token) {
+    return <Navigate to="/prestador/login" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 const App: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/encanador" element={<Encanador />} />
-      {/* <Route path="/pintor" element={<Pintor />} /> */}
-      {/* <Route path="/eletricista" element={<Eletricista />} /> */}
-      {/* <Route path="/pedreiro" element={<Pedreiro />} /> */}
-      <Route path="/diarista" element={<Diarista />} />
-      {/* <Route path="/jardineiro" element={<Jardineiro />} /> */}
-      <Route path="/servico" element={<Servico />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/prestador/login" element={<ProviderLogin />} />
+      <Route
+        path="/prestador"
+        element={
+          <ProtectedProviderRoute>
+            <ProviderDashboard />
+          </ProtectedProviderRoute>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/servico"
+        element={
+          <ProtectedRoute>
+            <Servico />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/:specialtySlug"
+        element={
+          <ProtectedRoute>
+            <Specialty />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
