@@ -12,6 +12,24 @@ type SpecialtyData = {
   description?: string;
 };
 
+type ProviderData = {
+  id: string;
+  name: string;
+  phone: string;
+  companyName: string;
+  specialtyName: string;
+  city?: string;
+  status: string;
+};
+
+type SelectedAppointment = {
+  service: string;
+  specialtyName: string;
+  date: string;
+  time: string;
+  provider: ProviderData;
+};
+
 const fallbackNames: Record<string, string> = {
   encanador: "Encanador",
   pintor: "Pintor",
@@ -19,15 +37,6 @@ const fallbackNames: Record<string, string> = {
   pedreiro: "Pedreiro",
   diarista: "Diarista",
   jardineiro: "Jardineiro",
-};
-
-const companyOptions: Record<string, string[]> = {
-  encanador: ["LS Conexoes", "Help Hidraulicas", "Plenseg"],
-  pintor: ["Pintura Express", "Casa Nova Pinturas", "Acabamento Pro"],
-  eletricista: ["Luz Forte Eletrica", "Volts Service", "Instalacoes Seguras"],
-  pedreiro: ["Cleiton Edificacoes", "Obra Certa", "Reforma Rapida"],
-  diarista: ["Diarista Prime", "Casa Limpa", "Organiza Facil"],
-  jardineiro: ["Verde Vivo", "Jardim Prime", "Raiz Paisagismo"],
 };
 
 const Container = styled.div`
@@ -117,6 +126,37 @@ const Status = styled.p`
   font-weight: bold;
 `;
 
+const ProviderList = styled.div`
+  display: grid;
+  gap: 10px;
+  width: 100%;
+`;
+
+const ProviderCard = styled.button<{ selected: boolean }>`
+  width: 100%;
+  border: 1px solid ${(props) => (props.selected ? "#1d4ed8" : "#e6e9f2")};
+  border-radius: 8px;
+  padding: 14px;
+  background: ${(props) => (props.selected ? "#eef4ff" : "#ffffff")};
+  color: #172033;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+`;
+
+const ProviderName = styled.strong`
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+`;
+
+const ProviderMeta = styled.span`
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.45;
+`;
+
 const Specialty: React.FC = () => {
   const { specialtySlug = "encanador" } = useParams();
   const navigate = useNavigate();
@@ -126,12 +166,12 @@ const Specialty: React.FC = () => {
     slug: specialtySlug,
     color: "#1d4ed8",
   });
-  const [company, setCompany] = useState("");
+  const [providers, setProviders] = useState<ProviderData[]>([]);
+  const [selectedProviderId, setSelectedProviderId] = useState("");
   const [date, setDate] = useState("2026-05-16");
   const [time, setTime] = useState("09:30");
   const [isLoading, setIsLoading] = useState(true);
-
-  const companies = companyOptions[specialty.slug] ?? ["Empresa parceira"];
+  const [isLoadingProviders, setIsLoadingProviders] = useState(true);
 
   useEffect(() => {
     async function loadSpecialty() {
@@ -157,8 +197,49 @@ const Specialty: React.FC = () => {
   }, [specialtySlug]);
 
   useEffect(() => {
-    setCompany(companies[0] ?? "");
-  }, [companies]);
+    async function loadProviders() {
+      setIsLoadingProviders(true);
+
+      try {
+        const data = await apiRequest<{ providers: ProviderData[] }>(
+          `/api/providers?specialtySlug=${specialtySlug}`
+        );
+
+        setProviders(data.providers);
+        setSelectedProviderId(data.providers[0]?.id ?? "");
+      } catch {
+        setProviders([]);
+        setSelectedProviderId("");
+      } finally {
+        setIsLoadingProviders(false);
+      }
+    }
+
+    loadProviders();
+  }, [specialtySlug]);
+
+  const selectedProvider = providers.find(
+    (provider) => provider.id === selectedProviderId
+  );
+
+  const handleSchedule = () => {
+    if (selectedProvider) {
+      const selectedAppointment: SelectedAppointment = {
+        service: specialty.slug,
+        specialtyName: specialty.name,
+        date,
+        time,
+        provider: selectedProvider
+      };
+
+      localStorage.setItem(
+        "itrampo:selectedAppointment",
+        JSON.stringify(selectedAppointment)
+      );
+    }
+
+    navigate("/servico");
+  };
 
   return (
     <Container>
@@ -177,17 +258,33 @@ const Specialty: React.FC = () => {
       </Section>
 
       <Section>
-        <SubLabel>Selecione a empresa</SubLabel>
-        <Select value={company} onChange={(event) => setCompany(event.target.value)}>
-          {companies.map((companyName) => (
-            <option key={companyName} value={companyName}>
-              {companyName}
-            </option>
+        <SubLabel>Prestadores cadastrados</SubLabel>
+        {isLoadingProviders && <Status>Carregando prestadores...</Status>}
+        {!isLoadingProviders && providers.length === 0 && (
+          <Status>Nenhum prestador cadastrado para esta especialidade.</Status>
+        )}
+        <ProviderList>
+          {providers.map((provider) => (
+            <ProviderCard
+              key={provider.id}
+              selected={provider.id === selectedProviderId}
+              type="button"
+              onClick={() => setSelectedProviderId(provider.id)}
+            >
+              <ProviderName>{provider.companyName}</ProviderName>
+              <ProviderMeta>Responsavel: {provider.name}</ProviderMeta>
+              <ProviderMeta>Telefone: {provider.phone}</ProviderMeta>
+              <ProviderMeta>Cidade: {provider.city || "Nao informada"}</ProviderMeta>
+            </ProviderCard>
           ))}
-        </Select>
+        </ProviderList>
       </Section>
 
-      <Button color={specialty.color} onClick={() => navigate("/servico")}>
+      <Button
+        color={specialty.color}
+        disabled={!selectedProviderId}
+        onClick={handleSchedule}
+      >
         Agendar horario
       </Button>
 

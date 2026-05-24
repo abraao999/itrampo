@@ -6,6 +6,7 @@ import Servico from "./pages/Final";
 import Specialty from "./pages/Specialty";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import ProviderLogin from "./pages/ProviderLogin";
+import UserRequests from "./pages/UserRequests";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -49,6 +50,14 @@ const App: React.FC = () => {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/solicitacoes"
+        element={
+          <ProtectedRoute>
+            <UserRequests />
           </ProtectedRoute>
         }
       />

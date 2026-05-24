@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import { FaWrench } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { apiRequest } from "../lib/api";
 
 const Container = styled.div`
   display: flex;
@@ -62,6 +63,22 @@ const Price = styled.p`
   margin-bottom: 20px;
 `;
 
+const ProviderBox = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e6e9f2;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 18px;
+  text-align: left;
+`;
+
+const ProviderInfo = styled.p`
+  margin: 6px 0;
+  color: #344054;
+  font-size: 14px;
+`;
+
 const Button = styled.button<{ primary?: boolean }>`
   width: 100%;
   padding: 14px;
@@ -87,8 +104,58 @@ const Back = styled(Link)`
 `;
 
 const Servico: React.FC = () => {
-  const handleAgendar = () => {
-    alert("Serviço agendado com sucesso!");
+  const selectedAppointment = useMemo(() => {
+    const storedAppointment = localStorage.getItem("itrampo:selectedAppointment");
+
+    return storedAppointment
+      ? (JSON.parse(storedAppointment) as {
+          service: string;
+          specialtyName: string;
+          date: string;
+          time: string;
+          provider: {
+            id: string;
+            companyName: string;
+            name: string;
+            phone: string;
+            city?: string;
+          };
+        })
+      : null;
+  }, []);
+
+  const handleAgendar = async () => {
+    const storedUser = localStorage.getItem("itrampo:user");
+    const user = storedUser
+      ? (JSON.parse(storedUser) as { name?: string; email?: string; phone?: string })
+      : null;
+
+    if (!selectedAppointment) {
+      alert("Selecione um prestador antes de agendar.");
+      return;
+    }
+
+    try {
+      await apiRequest("/api/appointments", {
+        method: "POST",
+        body: {
+          service: selectedAppointment.specialtyName,
+          company: selectedAppointment.provider.companyName,
+          providerId: selectedAppointment.provider.id,
+          providerName: selectedAppointment.provider.name,
+          providerPhone: selectedAppointment.provider.phone,
+          customerName: user?.name ?? "Cliente",
+          customerEmail: user?.email,
+          customerPhone: user?.phone,
+          date: selectedAppointment.date,
+          time: selectedAppointment.time
+        }
+      });
+
+      alert("Serviço agendado com sucesso!");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Nao foi possivel agendar.");
+    }
   };
 
   const handleNegar = () => {
@@ -106,9 +173,32 @@ const Servico: React.FC = () => {
 
       <Section>
         <Label>Serviço</Label>
-        <SubLabel>Reparo de vazamento</SubLabel>
+        <SubLabel>{selectedAppointment?.specialtyName ?? "Servico selecionado"}</SubLabel>
+        {selectedAppointment && (
+          <SubLabel>
+            {selectedAppointment.date} as {selectedAppointment.time}
+          </SubLabel>
+        )}
         <Price>R$150,00</Price>
       </Section>
+
+      {selectedAppointment && (
+        <ProviderBox>
+          <Label>Prestador</Label>
+          <ProviderInfo>
+            <strong>Empresa:</strong> {selectedAppointment.provider.companyName}
+          </ProviderInfo>
+          <ProviderInfo>
+            <strong>Responsavel:</strong> {selectedAppointment.provider.name}
+          </ProviderInfo>
+          <ProviderInfo>
+            <strong>Telefone:</strong> {selectedAppointment.provider.phone}
+          </ProviderInfo>
+          <ProviderInfo>
+            <strong>Cidade:</strong> {selectedAppointment.provider.city || "Nao informada"}
+          </ProviderInfo>
+        </ProviderBox>
+      )}
 
       <Button primary onClick={handleAgendar}>
         Agendar

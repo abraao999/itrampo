@@ -9,6 +9,7 @@ import {
   FaBroom,
   FaLeaf,
   FaUser,
+  FaClipboardList,
 } from "react-icons/fa";
 import logo from "../assets/Logo.png";
 import { apiRequest } from "../lib/api";
@@ -63,6 +64,22 @@ const LoginLink = styled(Link)`
   justify-content: center;
   background: #1d4ed8;
   color: #ffffff;
+  text-decoration: none;
+`;
+
+const RequestsLink = styled(Link)`
+  width: min(100%, 360px);
+  box-sizing: border-box;
+  border-radius: 8px;
+  padding: 13px 14px;
+  margin-bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #eef4ff;
+  color: #1d4ed8;
+  font-weight: 800;
   text-decoration: none;
 `;
 
@@ -131,6 +148,11 @@ const Home: React.FC = () => {
 
       {isLoading && <Status>Carregando especialidades...</Status>}
       {hasError && <Status>Mostrando especialidades padrao.</Status>}
+
+      <RequestsLink to="/solicitacoes">
+        <FaClipboardList />
+        Minhas solicitacoes
+      </RequestsLink>
 
       <Grid>
         {specialties.map((specialty) => {
