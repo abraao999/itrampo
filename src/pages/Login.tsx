@@ -183,15 +183,15 @@ const Message = styled.p<{ error?: boolean }>`
   font-weight: 700;
 `;
 
-const ProviderLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  color: #1d4ed8;
-  font-weight: 800;
-  text-decoration: none;
-`;
+// const ProviderLink = styled(Link)`
+//   display: inline-flex;
+//   align-items: center;
+//   gap: 8px;
+//   margin-top: 16px;
+//   color: #1d4ed8;
+//   font-weight: 800;
+//   text-decoration: none;
+// `;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -359,10 +359,10 @@ const Login: React.FC = () => {
           {message && <Message error={isError}>{message}</Message>}
         </Panel>
 
-        <ProviderLink to="/prestador/login">
+        {/* <ProviderLink to="/prestador/login">
           <FaBriefcase />
           Entrar como prestador
-        </ProviderLink>
+        </ProviderLink> */}
       </Shell>
     </Page>
   );
