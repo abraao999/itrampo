@@ -359,10 +359,10 @@ const Login: React.FC = () => {
           {message && <Message error={isError}>{message}</Message>}
         </Panel>
 
-        <ProviderLink to="/prestador/login">
+        {/* <ProviderLink to="/prestador/login">
           <FaBriefcase />
           Entrar como prestador
-        </ProviderLink>
+        </ProviderLink> */}
       </Shell>
     </Page>
   );
