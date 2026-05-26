@@ -10,9 +10,12 @@ import {
   FaLeaf,
   FaUser,
   FaClipboardList,
+  FaDraftingCompass,
+  FaCar,
 } from "react-icons/fa";
 import logo from "../assets/Logo.png";
 import { apiRequest } from "../lib/api";
+import { useNavigate } from "react-router-dom";
 
 type Specialty = {
   _id: string;
@@ -29,15 +32,60 @@ const iconMap = {
   hammer: FaHammer,
   broom: FaBroom,
   leaf: FaLeaf,
+  car: FaCar,
+  "drafting-compass": FaDraftingCompass,
 };
 
 const fallbackSpecialties: Specialty[] = [
-  { _id: "encanador", name: "Encanador", slug: "encanador", icon: "wrench", color: "#2563eb" },
-  { _id: "pintor", name: "Pintor", slug: "pintor", icon: "paint-roller", color: "#dc2626" },
-  { _id: "eletricista", name: "Eletricista", slug: "eletricista", icon: "bolt", color: "#f59e0b" },
-  { _id: "pedreiro", name: "Pedreiro", slug: "pedreiro", icon: "hammer", color: "#92400e" },
-  { _id: "diarista", name: "Diarista", slug: "diarista", icon: "broom", color: "#6d28d9" },
-  { _id: "jardineiro", name: "Jardineiro", slug: "jardineiro", icon: "leaf", color: "#f97316" },
+  {
+    _id: "encanador",
+    name: "Encanador",
+    slug: "encanador",
+    icon: "wrench",
+    color: "#2563eb",
+  },
+  {
+    _id: "pintor",
+    name: "Pintor",
+    slug: "pintor",
+    icon: "paint-roller",
+    color: "#dc2626",
+  },
+  {
+    _id: "eletricista",
+    name: "Eletricista",
+    slug: "eletricista",
+    icon: "bolt",
+    color: "#f59e0b",
+  },
+  {
+    _id: "pedreiro",
+    name: "Pedreiro",
+    slug: "pedreiro",
+    icon: "hammer",
+    color: "#92400e",
+  },
+  {
+    _id: "diarista",
+    name: "Diarista",
+    slug: "diarista",
+    icon: "broom",
+    color: "#6d28d9",
+  },
+  {
+    _id: "jardineiro",
+    name: "Jardineiro",
+    slug: "jardineiro",
+    icon: "leaf",
+    color: "#f97316",
+  },
+  {
+    _id: "engenheiro",
+    name: "Engenheiro",
+    slug: "engenheiro",
+    icon: "drafting-compass",
+    color: "#00CEC8",
+  },
 ];
 
 const Container = styled.div`
@@ -115,14 +163,18 @@ const Status = styled.p`
 `;
 
 const Home: React.FC = () => {
-  const [specialties, setSpecialties] = useState<Specialty[]>(fallbackSpecialties);
+  const [specialties, setSpecialties] =
+    useState<Specialty[]>(fallbackSpecialties);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadSpecialties() {
       try {
-        const data = await apiRequest<{ specialties: Specialty[] }>("/api/specialties");
+        const data = await apiRequest<{ specialties: Specialty[] }>(
+          "/api/specialties",
+        );
 
         setSpecialties(data.specialties);
         setHasError(false);
@@ -136,12 +188,16 @@ const Home: React.FC = () => {
 
     loadSpecialties();
   }, []);
-
+  const handleLogout = () => {
+    localStorage.removeItem("itrampo:token");
+    localStorage.removeItem("itrampo:user");
+    navigate("/login", { replace: true });
+  };
   return (
     <Container>
       <Header>
         <img src={logo} alt="" />
-        <LoginLink to="/login" aria-label="Entrar">
+        <LoginLink to="/login" aria-label="Entrar" onClick={handleLogout}>
           <FaUser />
         </LoginLink>
       </Header>
@@ -156,10 +212,15 @@ const Home: React.FC = () => {
 
       <Grid>
         {specialties.map((specialty) => {
-          const Icon = iconMap[specialty.icon as keyof typeof iconMap] ?? FaWrench;
+          const Icon =
+            iconMap[specialty.icon as keyof typeof iconMap] ?? FaWrench;
 
           return (
-            <Card key={specialty._id} to={`/${specialty.slug}`} color={specialty.color}>
+            <Card
+              key={specialty._id}
+              to={`/${specialty.slug}`}
+              color={specialty.color}
+            >
               <Icon />
               {specialty.name}
             </Card>

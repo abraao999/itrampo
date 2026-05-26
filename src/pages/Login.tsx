@@ -183,15 +183,15 @@ const Message = styled.p<{ error?: boolean }>`
   font-weight: 700;
 `;
 
-const ProviderLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  color: #1d4ed8;
-  font-weight: 800;
-  text-decoration: none;
-`;
+// const ProviderLink = styled(Link)`
+//   display: inline-flex;
+//   align-items: center;
+//   gap: 8px;
+//   margin-top: 16px;
+//   color: #1d4ed8;
+//   font-weight: 800;
+//   text-decoration: none;
+// `;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -226,8 +226,8 @@ const Login: React.FC = () => {
           body:
             mode === "login"
               ? { email, password }
-              : { name, email, phone, password }
-        }
+              : { name, email, phone, password },
+        },
       );
 
       localStorage.setItem("itrampo:token", response.token);
@@ -259,7 +259,9 @@ const Login: React.FC = () => {
             <FaBriefcase />
             Area do usuario
           </Eyebrow>
-          <Title>{mode === "login" ? "Entre na sua conta" : "Crie sua conta"}</Title>
+          <Title>
+            {mode === "login" ? "Entre na sua conta" : "Crie sua conta"}
+          </Title>
           <Subtitle>
             {mode === "login"
               ? "Acesse seus pedidos, orcamentos e agendamentos."
@@ -326,7 +328,9 @@ const Login: React.FC = () => {
             Senha
             <PasswordField>
               <Input
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -355,10 +359,10 @@ const Login: React.FC = () => {
           {message && <Message error={isError}>{message}</Message>}
         </Panel>
 
-        <ProviderLink to="/prestador/login">
+        {/* <ProviderLink to="/prestador/login">
           <FaBriefcase />
           Entrar como prestador
-        </ProviderLink>
+        </ProviderLink> */}
       </Shell>
     </Page>
   );
